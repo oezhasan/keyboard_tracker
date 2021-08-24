@@ -1,36 +1,45 @@
 from pynput import keyboard
 import pickle
 import atexit
+import csv
 
-dict = pickle.load(open("save.p", "rb"))
+d = {}
 
+def open_csv():
+    reader = csv.reader(open('keyboard_tracker.csv', 'r'))
+    for k,v in reader:
+        d[k] = v
 
 def on_release(key):
-    print(dict)
     try:
-
         k = key.char
     except:
         k = key.name
 
     try:
         track_key(k)
-
+        print(k)
     except:
         pass
 
 def track_key(k):
-    if k in dict:
-        dict[k] += 1
+    if k in d:
+        d[k] += 1
     else:
-        dict[k] = 1
+        d[k] = 1
 
-def exit_handler():
-    print(dict)
-    pickle.dump(dict, open("save.p", "wb"))
+def save_csv():
+    with open('keyboard_tracker.csv', 'wb') as output:
+        writer = csv.writer(output)
+        for k, v in d.items():
+            writer.writerow([k, v])
 
-
-atexit.register(exit_handler)
-listener = keyboard.Listener(on_release=on_release)
-listener.start()  # start to listen on a separate thread
-listener.join()  # remove if main thread is polling self.keys
+if __name__ == '__main__':
+    try:
+        open_csv()
+        listener = keyboard.Listener(on_release=on_release)
+        listener.start()  # start to listen on a separate thread
+        listener.join()  # remove if main thread is polling self.keys
+    finally:
+        print("Programm beendet")
+        save_csv()
