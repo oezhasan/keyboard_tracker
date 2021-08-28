@@ -55,6 +55,7 @@ def track_key(key):
     print(c.fetchall())
     conn.close()
 
+
 if __name__ == '__main__':
     #db("clear") #create, clear
     key_listener()
