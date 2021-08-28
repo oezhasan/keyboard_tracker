@@ -23,10 +23,7 @@ def on_release(key):
         print(e)
 
 def keyboard_representation(k):
-    switcher = {
-        "1": "!",
-        "2": ['"', "²"]
-    }
+    pass
 
 
 
