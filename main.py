@@ -3,12 +3,25 @@ import pickle
 import csv
 import sqlite3
 
-"""
-def db():
-    c.execute("CREATE TABLE keyboard_counter (key text, counter integer)")
+
+def db(command):
+    conn = sqlite3.connect('keyboard_counter.db')
+    c = conn.cursor()
+    if command == "create":
+        c.execute("CREATE TABLE keyboard_counter (key text, counter integer)")
+    elif command == "clear":
+        c.execute("DELETE FROM keyboard_counter")
+    else:
+        pass
     conn.commit()
     conn.close()
-"""
+
+
+
+def key_listener():
+    listener = keyboard.Listener(on_release=on_release)
+    listener.start()  # start to listen on a separate thread
+    listener.join()  # remove if main thread is polling self.keys
 
 def on_release(key):
     try:
@@ -18,7 +31,7 @@ def on_release(key):
 
     try:
         print(k)
-        track_key(k)
+        track_key(k.lower())
     except Exception as e:
         print(e)
 
@@ -32,10 +45,8 @@ def track_key(key):
     c = conn.cursor()
     c.execute("SELECT * FROM keyboard_counter WHERE key=?", [key])
     if c.fetchall():
-        print("1")
         c.execute("UPDATE keyboard_counter SET counter = counter + 1 WHERE  key=?", [key])
     else:
-        print("2")
         c.execute("INSERT INTO keyboard_counter VALUES (?, 1)", [key])
 
     conn.commit()
@@ -45,8 +56,8 @@ def track_key(key):
     conn.close()
 
 if __name__ == '__main__':
-    #db()
+    #db("clear") #create, clear
+    key_listener()
 
-    listener = keyboard.Listener(on_release=on_release)
-    listener.start()  # start to listen on a separate thread
-    listener.join()  # remove if main thread is polling self.keys
+
+
